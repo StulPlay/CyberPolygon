@@ -1,1 +1,0 @@
-# CyberPolygon
