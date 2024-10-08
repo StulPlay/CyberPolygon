@@ -1,0 +1,41 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.define "task1" do |task1|
+	task1.vm.box = "ubuntu/bionic64"
+
+	task1.vm.provider "virtualbox" do |vb|
+	vb.name = "CyberTask1"
+	vb.memory = "1024"
+	vb.cpus = 1
+	end
+  end
+  
+  config.vm.define "task2" do |task2|
+	task2.vm.box = "ubuntu/bionic64"
+
+	task2.vm.provider "virtualbox" do |vb|
+	vb.name = "CyberTask2"
+	vb.memory = "1024"
+	vb.cpus = 1
+	end
+  end
+
+  # Генерация случайного пароля и содержимого файла флага
+  password = (0...8).map { (65 + rand(26)).chr }.join
+  flag_content = "Flag: " + (0...10).map { (65 + rand(26)).chr }.join
+  
+  config.vm.provision "shell", inline: <<-SHELL
+    # Устанавливаем случайный пароль
+    echo 'vagrant:#{password}' | sudo chpasswd
+    
+    # Создаем файл /usr/flag с уникальным содержимым
+    echo "#{flag_content}" | sudo tee /usr/flag
+  SHELL
+
+  # Используем встроенный метод для вывода данных при настройке
+  config.vm.provision "shell", run: "always" do |s|
+    s.inline = "echo 'Generated password for vagrant: #{password}'"
+  end
+end
